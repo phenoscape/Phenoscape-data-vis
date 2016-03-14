@@ -1,29 +1,26 @@
-var request= new XMLHttpRequest();
-var uberon=["0000033","0000032"];
-var aname;
-for (var i=0; i<uberon.length; i++){
-	var url="http://kb.phenoscape.org/api/term?iri=http:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_"+uberon[i];
-}
-request.open('GET',url)
-var names=[];
+var count;
+var counts=[];
+var request = new XMLHttpRequest();
+var annotated_taxa_count='0034991';
+var url='http://kb.phenoscape.org/api/taxon/annotated_taxa_count?in_taxon=http://purl.obolibrary.org/obo/VTO_'+annotated_taxa_count;
+/**request.open('GET', url);
 
 request.onreadystatechange = function () {
   if (this.readyState === 4) {
     console.log('Status:', this.status);
     console.log('Headers:', this.getAllResponseHeaders());
     console.log('Body:', this.responseText);
-    console.log("Label: ", this.label);
   }
 };
 
+request.send();
+**/
 // works!
 
 $.getJSON(url, function(json){
-	aname=json.label;
-	names.push(name);
-	alert(name);
-	console.log('Anatomy: ', name);
+	count=json.total;
+	counts.push(count);
+	alert(count);
+	console.log('Taxa total: ', count);
 });
 
-
-request.send();
