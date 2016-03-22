@@ -3,7 +3,7 @@ Created on Mar 11, 2016
 
 @author: lucy
 '''
-from Taxa_Counts import *
+from Taxa_Counts import count
 from bokeh.charts import Bar, output_file, show
 from bokeh.models import HoverTool
 from bokeh.plotting import output_file
@@ -12,18 +12,6 @@ from bokeh.plotting import output_file
 
 output_file("hover_callback.html")
 
-# create dictionary of taxa names and taxa counts
-count={}
-labels=[]
-taxaCount=[]
-first_layer_taxa=['Amniota', 'Tetrapoda', 'Carnivora']
-for taxa in first_layer_taxa:
-    labels.append(taxa)
-    taxaCount.append(get_taxa_count(taxa))
-
-count['label']=labels
-count['taxaCount']=taxaCount
-print count
 # parameter: countDict, a dictionary of taxaCount and taxa name
 def create_barChart(countDict):
     hover = HoverTool(

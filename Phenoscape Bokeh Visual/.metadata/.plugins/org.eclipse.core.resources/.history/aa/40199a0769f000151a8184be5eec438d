@@ -13,13 +13,15 @@ from bokeh.plotting import output_file
 output_file("hover_callback.html")
 
 # create dictionary of taxa names and taxa counts
+i=0
 count={}
 labels=[]
 taxaCount=[]
 first_layer_taxa=['Amniota', 'Tetrapoda', 'Carnivora']
 for taxa in first_layer_taxa:
-    labels.append(taxa)
-    taxaCount.append(get_taxa_count(taxa))
+    labels[i]=taxa
+    taxaCount[i]=get_taxa_count(taxa)
+    i=i+1
 
 count['label']=labels
 count['taxaCount']=taxaCount

@@ -14,16 +14,15 @@ output_file("hover_callback.html")
 
 # create dictionary of taxa names and taxa counts
 count={}
-labels=[]
-taxaCount=[]
 first_layer_taxa=['Amniota', 'Tetrapoda', 'Carnivora']
-for taxa in first_layer_taxa:
-    labels.append(taxa)
-    taxaCount.append(get_taxa_count(taxa))
+for i in first_layer_taxa:
+    if not i in count:
+        count['label']=i
+        count['taxaCount']=get_taxa_count(i)
+    else:
+        count['label'].append(i)
+        count['taxaCount'].append(get_taxa_count(i))
 
-count['label']=labels
-count['taxaCount']=taxaCount
-print count
 # parameter: countDict, a dictionary of taxaCount and taxa name
 def create_barChart(countDict):
     hover = HoverTool(
