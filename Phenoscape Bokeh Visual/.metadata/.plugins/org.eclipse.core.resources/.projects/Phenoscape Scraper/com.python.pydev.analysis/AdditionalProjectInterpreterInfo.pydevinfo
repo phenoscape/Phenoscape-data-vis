@@ -1,12 +1,25 @@
 -- VERSION_4
 -- START DISKCACHE_2
 C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\.metadata\.plugins\org.eclipse.core.resources\.projects\Phenoscape Scraper\com.python.pydev.analysis\v2_indexcache
+UberonFileWriter|1458514388054081000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Phenoscape Scraper\UberonFileWriter.py
+PhenoscapeTaxa|1458514388053080000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Phenoscape Scraper\PhenoscapeTaxa.py
 -- END DISKCACHE
 -- START DICTIONARY
-0
+2
+1=UberonFileWriter
+2=PhenoscapeTaxa
 -- END DICTIONARY
 -- START TREE 1
-0
+9
+n|1|n!11@
+nam|1|name!19@
+new|1|newtext!19@
+num|1|numsText!11@
+phe|1|phenoTotal!19@
+pre|2|pres!19@presence!19@
+r|1|r!11@
+tex|1|text!11@
+ube|3|uberonPres!19@uberonNumsParsed!11@uberonFile!19@
 -- END TREE
 -- START TREE 2
 0
