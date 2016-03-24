@@ -9,7 +9,7 @@ var url='http://kb.phenoscape.org/api/taxon/annotated_taxa_count?in_taxon=http:/
 for (var i=1; i<10; i++){
     urls.push(url+'000000'+String(i));
 }
-
+//put in for loop, 
 $.getJSON(urls[0], function(json){
     count=json.total; 
     bardata.push(parseInt(count));
@@ -23,6 +23,11 @@ console.log(urls[5]);
 console.log("Here: "+bardata[0]);
 bardata.sort(function compareNumbers(a,b) {
     return a -b;
+});
+
+// functions to get data
+d3.csv("VTO.csv", function(d){
+    console.log(Object.keys(d));
 });
 
 var margin = { top: 30, right: 30, bottom: 40, left:50 }

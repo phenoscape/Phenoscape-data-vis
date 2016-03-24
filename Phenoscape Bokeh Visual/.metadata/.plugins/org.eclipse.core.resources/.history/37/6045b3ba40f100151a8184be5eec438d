@@ -7,7 +7,6 @@ from Taxa_Counts import *
 from bokeh.charts import Bar, output_file, show
 from bokeh.models import HoverTool
 from bokeh.plotting import output_file
-from bokeh.io import push_notebook, output_notebook, push
 #from bokeh.io import output_notebook, show # output notebool loads BokehJS
 #from bokeh.plotting import figure, output_file, show
 
@@ -36,11 +35,7 @@ def create_barChart(countDict):
     #show(p)
     return p
 
-taxaPlot=create_barChart(count)
-show(taxaPlot)
-#taxaPlot.title='Dummy title'
-#push()
-#push_notebook()
+show(create_barChart(count))
 
 
 
