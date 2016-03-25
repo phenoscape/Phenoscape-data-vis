@@ -34,28 +34,29 @@ function get_uberon(anatomy,callback){
 }
 
 //function gets all of the urls of the taxa within the rank of a specific super-taxon. Parameter VTO is of the super taxon.
-function getTaxaInRank(VTO, callback){
-	var allTaxainRank=[];
-	var taxaUrl='http://kb.phenoscape.org/api/taxon/with_rank?rank=http://purl.obolibrary.org/obo/TAXRANK_0000003&in_taxon='+VTO
-	$.getJSON(taxaUrl, function(json){
-		taxa=json.results[1]['@id']; //how to get json element?!
+function getDescendants(uberon, callback){
+	var descendants=[];
+	var descUrl='http://kb.phenoscape.org/api/term/all_descendants?iri=http://purl.obolibrary.org/obo/UBERON_'+uberon;
+	$.getJSON(descUrl, function(json){
 		for (var i=0; i<json.results.length; i++){
-			taxa=json.results[i]['@id'];
-			allTaxainRank.push(taxa)
+			uberon=json.results[i]['@id'];
+			descendants.push(uberon)
 			//console.log('Taxa url rank: ', taxa);
 		}
-		callback(allTaxainRank);
+		callback(descendants);
 	});
 }
+// base cases to graph
 var uberonBaseNames=['integumental system', 'dermatocranium', 'neurocranium', 'jaw region','ventral hyoid arch skeleton','post-cranial axial skeletal system','forelimb skeleton','hindlimb skeleton','fin skeleton','pectoral girdle skeleton','pelvic girdle skeleton']; //no 0005886
 var uberonData=[];
 //test the functions
 for (var i=0; i<uberonBaseNames.length; i++){
+	console.log(uberonBaseNames[i]);
 	get_uberon(uberonBaseNames[i],function(url) {
 		// get array of all the taxa in the super-taxa
-		//getTaxaInRank(url,function(subTaxa){
-		//	console.log(subTaxa);
-		//});
+		getDescendants(url,function(uberon){
+			console.log(uberon);
+		});
 		get_total(url,function(total){
 			//store total count into array
 			uberonData[uberonBaseNames[i]]=total;
