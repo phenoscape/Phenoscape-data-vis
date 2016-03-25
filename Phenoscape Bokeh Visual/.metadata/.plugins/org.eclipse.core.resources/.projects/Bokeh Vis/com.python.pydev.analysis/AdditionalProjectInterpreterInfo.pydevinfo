@@ -1,34 +1,32 @@
 -- VERSION_4
 -- START DISKCACHE_2
 C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\.metadata\.plugins\org.eclipse.core.resources\.projects\Bokeh Vis\com.python.pydev.analysis\v2_indexcache
-Taxa_Counts|1458514354794178000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Bokeh Vis\Taxa_Counts.py
-Bokeh_Vis|1458514354782177000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Bokeh Vis\Bokeh_Vis.py
+Taxa_Counts|1458654708406611000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Bokeh Vis\Taxa_Counts.py
+Bokeh_Vis|1458822480708075000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Bokeh Vis\Bokeh_Vis.py
 AncestorMethods|1458514354740175000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Bokeh Vis\AncestorMethods.py
 textExample|1458514354795178000|C:\Users\lucy\Documents\GitHub\Phenoscape-data-vis\Phenoscape Bokeh Visual\Bokeh Vis\textExample.py
 -- END DISKCACHE
 -- START DICTIONARY
 4
-2=Taxa_Counts
-3=Bokeh_Vis
+3=Taxa_Counts
+2=Bokeh_Vis
 1=textExample
 4=AncestorMethods
 -- END DICTIONARY
 -- START TREE 1
-15
+13
 bar|1|bar!11@
 cat|1|cat!11@
-cel|2|cellLabel!19@cellValue!19@
 cou|1|count!19@
-cre|1|create_barChart!26@
-dat|1|data!19@
-get|2|get_url!18@getTaxaInRank!34@
+cre|1|create_barChart!18@
+dat|1|data!27@
+fir|1|first_layer_taxa!19@
+get|3|get_url!26@getTaxaInRank!34@get_taxa_count!26@
 lab|1|labels!19@
-num|1|num!19@
-she|1|sheet!19@
+she|1|sheet!27@
 sub|1|subClassOf!34@
 sup|1|superClassOf!34@
-tax|1|taxaCount!19@
-url|1|url!19@
+tax|2|taxaPlot!19@taxaCount!19@
 xyv|1|xyvalues!11@
 -- END TREE
 -- START TREE 2

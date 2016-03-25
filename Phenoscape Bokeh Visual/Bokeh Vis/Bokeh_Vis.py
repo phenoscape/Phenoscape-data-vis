@@ -38,9 +38,7 @@ def create_barChart(countDict):
 
 taxaPlot=create_barChart(count)
 show(taxaPlot)
-#taxaPlot.title='Dummy title'
-#push()
-#push_notebook()
+
 
 
 
