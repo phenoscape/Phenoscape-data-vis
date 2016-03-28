@@ -16,7 +16,7 @@ function get_uberon(anatomy, callback) {
 			var term = data[i].Term_label;
 			if (term == anatomy) {
 				var uberon = data[i].UberonNum;
-				console.log(uberon);
+				//console.log(uberon);
 				callback(uberon);
 			}
 			//j=j+1;
@@ -41,7 +41,7 @@ function getDescendants(uberon, callback) {
 		for (var i = 0; i < json.results.length; i++) {
 			uberon = json.results[i]['@id'];
 			descendants.push(uberon)
-				//console.log('Taxa url rank: ', taxa);
+				console.log(uberon);
 		}
 		callback(descendants);
 	});
@@ -52,23 +52,25 @@ var uberonData = []; //associative array
 var uberonTot = [];
 var uberonLabel = [];
 
+//Query for the base cases
 for (var i = 0; i < uberonBaseNames.length; i++) {
 	console.log(uberonBaseNames[i]);
 	get_uberon(uberonBaseNames[i], function(url) {
 		// get array of all the taxa in the super-taxa
 		getDescendants(url, function(uberon) {
-			console.log(uberon);
+			//console.log(uberon);
 		});
 		get_total(url, function(total) {
 			//store total count into array
 			uberonData[uberonBaseNames[i]] = total;
 			uberonTot.push(total);
 			uberonLabel.push(uberonBaseNames[i]);
-			console.log('Total:' + total);
-			if (uberonTot.length==uberonBaseNames.length){
+			console.log(uberonBaseNames[i]+':' + total);
+			if (uberonTot.length > uberonBaseNames.length) {
 				drawBarChart(uberonTot);
+				console.log(uberonTot);
 			}
-			console.log('length'+uberonBaseNames.length);
+			//console.log('length' + uberonBaseNames.length);
 			//graphing part
 			//drawBarChart(uberonLabel);
 		});
@@ -77,132 +79,161 @@ for (var i = 0; i < uberonBaseNames.length; i++) {
 
 }
 
+
+//hard code base cases:
+var baseTotals=[277,574,1653,0,528,0,0,0,0,313,1108,426];
+drawBarChart(baseTotals);
+
+//hard code associative array
+dict={'integumental system': 277, 'neurocranium': 1653, 'hindlimb skeleton': 0, 'jaw region': 0, 'hyoid arch skeleton': 528, 'forelimb skeleton': 0, 'fin skeleton': 313, 'dermatocranium': 574, 'pectoral girdle skeleton': 1108, 'pelvic girdle skeleton': 426, 'ventral hyoid arch skeleton': 0, 'post-cranial axial skeletal system': 0}
+        var stuff=d3.entries(dict);
+        console.log(stuff);
+
+
 //function that draws the bar chart
 //parameter dataSet is an associative array
 function drawBarChart(uberonTot) {
 	var margin = {
-				top: 30,
-				right: 30,
-				bottom: 40,
-				left: 50
-			}
+		top: 30,
+		right: 100,
+		bottom: 40,
+		left: 100
+	}
 
-			var height = 400 - margin.top - margin.bottom,
-				width = 600 - margin.left - margin.right,
-				barWidth = 50,
-				barOffset = 5;
+	var height = 400 - margin.top - margin.bottom,
+		width = 600 - margin.left - margin.right,
+		barWidth = 50,
+		barOffset = 5;
 
-			var tempColor;
+	var tempColor;
 
-			var colors = d3.scale.linear()
-				.domain([0, uberonTot.length * .33, uberonTot.length * .66, uberonTot.length])
-				.range(['#B58929', '#C61C6F', '#268BD2', '#85992C'])
+	var colors = d3.scale.linear()
+		.domain([0, uberonTot.length * .33, uberonTot.length * .66, uberonTot.length])
+		.range(['#B58929', '#C61C6F', '#268BD2', '#85992C'])
 
-			var yScale = d3.scale.linear()
-				.domain([0, d3.max(uberonTot)])
-				.range([0, height]);
+	var yScale = d3.scale.linear()
+		.domain([0, d3.max(uberonTot)])
+		.range([0, height]);
 
-			var xScale = d3.scale.ordinal()
-				.domain(d3.range(0, uberonTot.length))
-				.rangeBands([0, width], 0.2)
+	var xScale = d3.scale.ordinal()
+		//.domain(d3.range(0, uberonTot.length))
+		.domain(d3.range(0, uberonTot.length))
+		.rangeBands([0, width], 0.2)
 
-			var tooltip = d3.select('body').append('div')
-				.style('position', 'absolute')
-				.style('padding', '0 10px')
-				.style('background', 'white')
-				.style('opacity', 0)
+	var tooltip = d3.select('body').append('div')
+		.style('position', 'absolute')
+		.style('padding', '0 10px')
+		.style('background', 'white')
+		.style('opacity', 0)
 
-			var myChart = d3.select('#chart').append('svg')
-				.style('background', '#E7E0CB')
-				.attr('width', width + margin.left + margin.right)
-				.attr('height', height + margin.top + margin.bottom)
-				.append('g')
-				.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-				.selectAll('rect').data(uberonTot)
-				.enter().append('rect')
-				.style('fill', function(d, i) {
-					return colors(i);
-				})
-				.attr('width', xScale.rangeBand())
-				.attr('x', function(d, i) {
-					return xScale(i);
-				})
-				.attr('height', 0)
-				.attr('y', height)
+	var myChart = d3.select('#chart').append('svg')
+		.style('background', '#E7E0CB')
+		.attr('width', width + margin.left + margin.right)
+		.attr('height', height + margin.top + margin.bottom)
+		.append('g')
+		.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+		.selectAll('rect').data(uberonTot)
+		.enter().append('rect')
+		.style('fill', function(d, i) {
+			return colors(i);
+		})
+		.attr('width', xScale.rangeBand())
+		.attr('x', function(d, i) {
+			return xScale(i);
+		})
+		.attr('height', 0)
+		.attr('y', height)
 
-			.on('mouseover', function(d) {
 
-				tooltip.transition()
-					.style('opacity', .9)
+	.on('mouseover', function(d) {
 
-				tooltip.html(d)
-					.style('left', (d3.event.pageX - 35) + 'px')
-					.style('top', (d3.event.pageY - 30) + 'px')
+		tooltip.transition()
+			.style('opacity', .9)
 
-				tempColor = this.style.fill;
-				d3.select(this)
-					.style('opacity', .5)
-					.style('fill', 'yellow')
-			})
+		tooltip.html(d)
+			.style('left', (d3.event.pageX - 35) + 'px')
+			.style('top', (d3.event.pageY - 30) + 'px')
+			.html('Annotated taxa count:<br/>' + d)
+		tempColor = this.style.fill;
+		d3.select(this)
+			.style('opacity', .5)
+			.style('fill', 'yellow')
 
-			.on('mouseout', function(d) {
-				d3.select(this)
-					.style('opacity', 1)
-					.style('fill', tempColor)
-			})
+	})
 
-			myChart.transition()
-				.attr('height', function(d) {
-					return yScale(d);
-				})
-				.attr('y', function(d) {
-					return height - yScale(d);
-				})
-				.delay(function(d, i) {
-					return i * 20;
-				})
-				.duration(1000)
-				.ease('elastic')
+	.on('mouseout', function(d) {
+		d3.select(this)
+			.style('opacity', 1)
+			.style('fill', tempColor)
+	})
 
-			var vGuideScale = d3.scale.linear()
-				.domain([0, d3.max(uberonTot)])
-				.range([height, 0])
+	myChart.transition()
+		.attr('height', function(d) {
+			return yScale(d);
+		})
+		.attr('y', function(d) {
+			return height - yScale(d);
+		})
+		.delay(function(d, i) {
+			return i * 20;
+		})
+		.duration(1000)
+		.ease('elastic')
 
-			var vAxis = d3.svg.axis()
-				.scale(vGuideScale)
-				.orient('left')
-				.ticks(10)
+	var vGuideScale = d3.scale.linear()
+		.domain([0, d3.max(uberonTot)])
+		.range([height, 0])
 
-			var vGuide = d3.select('svg').append('g')
-			vAxis(vGuide)
-			vGuide.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
-			vGuide.selectAll('path')
-				.style({
-					fill: 'none',
-					stroke: "#000"
-				})
-			vGuide.selectAll('line')
-				.style({
-					stroke: "#000"
-				})
+	var vAxis = d3.svg.axis()
+		.scale(vGuideScale)
+		.orient('left')
+		.ticks(10)
 
-			var hAxis = d3.svg.axis()
-				.scale(xScale)
-				.orient('bottom')
-				.tickValues(xScale.domain().filter(function(d, i) {
-					return !(i % (uberonTot.length / 5));
-				}))
+	var vGuide = d3.select('svg').append('g')
+	vAxis(vGuide)
+	vGuide.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')')
+	vGuide.selectAll('path')
+		.style({
+			fill: 'none',
+			stroke: "#000"
+		})
+	vGuide.selectAll('line')
+		.style({
+			stroke: "#000"
+		})
 
-			var hGuide = d3.select('svg').append('g')
-			hAxis(hGuide)
-			hGuide.attr('transform', 'translate(' + margin.left + ', ' + (height + margin.top) + ')')
-			hGuide.selectAll('path')
-				.style({
-					fill: 'none',
-					stroke: "#000"
-				})
-			hGuide.selectAll('line')
-				.style({
-					stroke: "#000"
-				})
+	var hAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient('bottom')
+		.tickValues(xScale.domain().filter(function(d, i) {
+			return !(i % (uberonTot.length / 5));
+		}))
+
+	var hGuide = d3.select('svg').append('g')
+	hAxis(hGuide)
+	hGuide.attr('transform', 'translate(' + margin.left + ', ' + (height + margin.top) + ')')
+	hGuide.selectAll('path')
+		.style({
+			fill: 'none',
+			stroke: "#000"
+		})
+	hGuide.selectAll('line')
+		.style({
+			stroke: "#000"
+		})
+
+	//x axis label
+	d3.select('svg').append("text")
+		.attr("transform", "translate(" + (width / 1.5) + " ," + (height + 1.2*margin.bottom) + ")")
+		.text("Anatomy")
+
+	//y axis label
+	d3.select('svg').append("text")
+		.attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x",0 - height / 3)
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Annotated taxa count");
+
 }
