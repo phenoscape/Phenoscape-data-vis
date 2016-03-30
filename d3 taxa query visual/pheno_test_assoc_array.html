@@ -57,6 +57,7 @@
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="jquery-2.2.1.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
 
@@ -126,16 +127,36 @@ svg.call(tip);
       .attr("height", function(d) { return height - y(d.value); })
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide)
-/**
-      //update to get sub anatomies based on click
-      .on('click',function(d,i){
-        //get new data
-        //get descendants
-        var desc=getDescendants(get_uberon(d.Anatomy));
-        get_total(get_uberon(d.Anatomy))
 
-      })**/
-//});
+      //update to get sub anatomies based on click
+      .on('click',function(d){ //ASK: Is this getting the data that corresponds with the bar?
+        //get new data by populating associative array
+        //get descendants
+        console.log(d.key);
+        var data=[];
+        //alert(d.Anatomy);
+        get_uberon(d.key, function(uberonNum){
+          getDescendants(uberonNum, function(descArray){
+            var names;
+            var totals;
+            for (var i=0; i<descArray.length; i++){
+              getName(descArray[i], function(name){
+                names[i]=name;
+              });
+              get_total(getUberon(descArray[i]), function(total){
+                totals[i]=total;
+              });
+            }
+            for (var i=0; i<names.length; i++){
+              data[names[i]]=totals[i];
+            }
+            console.log(data);
+            drawGraph(data);
+
+        });
+
+      })
+});
 
 function type(d) {
   d.value= +d.value;
@@ -143,8 +164,9 @@ function type(d) {
 }
 
 /**----------------------------**/
-//functions that get the data, DO I NEED THE CALLBACKS?
+//functions that get the data
 
+//Parameter: uberon number
 function get_total(uberon, callback) {
     var urlBase = 'http://kb.phenoscape.org/api/taxon/with_phenotype?entity=%3Chttp:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_' + uberon + '%3E&total=true';
     $.getJSON(urlBase, function(json) {
@@ -180,13 +202,14 @@ function get_uberon(anatomy, callback) {
     return;
 }
 
-//Need to get this method fixed, why is purlURL undefined?
-//Get uberon value using the url, not working?
-function getUberon(purlURL){
-  return purlUrl.splice(-7);
+//Get uberon number using the url
+function getUberon(purlUrl){
+  uberon=purlUrl.substr(purlUrl.length-7);
+  return uberon;
 }
 
-//function gets all of the purl urls of the taxa within the rank of a specific super-taxon. Parameter VTO is of the super taxon.
+//function gets all of the purl urls of the taxa within the rank of a specific super-taxon. 
+//parameter uberon: uberon number
 function getDescendants(uberon, callback) {
     var descendants = [];
     var descUrl = 'http://kb.phenoscape.org/api/term/all_descendants?iri=http://purl.obolibrary.org/obo/UBERON_' + uberon;
