@@ -56,6 +56,7 @@
 
 </style>
 <body>
+<script src="//cdn.jsdelivr.net/rsvp/3.0.6/rsvp.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="jquery-2.2.1.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
@@ -64,99 +65,7 @@
 var data={'integumental system': 277, 'neurocranium': 1653, 'hindlimb skeleton': 0, 'jaw region': 0, 'hyoid arch skeleton': 528, 'forelimb skeleton': 0, 'fin skeleton': 313, 'dermatocranium': 574, 'pectoral girdle skeleton': 1108, 'pelvic girdle skeleton': 426, 'ventral hyoid arch skeleton': 0, 'post-cranial axial skeletal system': 0}
 
 //need to replace this with drawGraph(data)!!!!!!
-var margin = {top: 70, right: 20, bottom: 30, left: 60},
-    width = 960 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
-
-var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1)
-    .domain(d3.entries(data).map(function(d) { return d.key }));
-
-var y = d3.scale.linear()
-    .domain([0,getMax(data)])
-    .range([height, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .ticks(10);
-var tip = d3.tip()
-  .attr('class', 'd3-tip')
-  .offset([-10, 0])
-  .html(function(d) {
-    return d.key+"<br/>"+"Annontated taxa count: "+d.value;
-  })
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-svg.call(tip);
-
-//d3.tsv("data.tsv", type, function(error, data) {
-//  if (error) throw error;
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("taxaCount");
-
-  svg.selectAll(".bar")
-      .data(d3.entries(data))
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.key); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.value); })
-      .attr("height", function(d) { return height - y(d.value); })
-      .on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
-
-      //update to get sub anatomies based on click
-      .on('click',function(d){ //ASK: Is this getting the data that corresponds with the bar?
-        //get new data by populating associative array
-        //get descendants
-        console.log(d.key);
-        var data=[];
-        //alert(d.Anatomy);
-        get_uberon(d.key, function(uberonNum){
-          getDescendants(uberonNum, function(descArray){
-            var names;
-            var totals;
-            for (var i=0; i<descArray.length; i++){
-              getName(descArray[i], function(name){
-                names[i]=name;
-              });
-              get_total(getUberon(descArray[i]), function(total){
-                totals[i]=total;
-              });
-            }
-            for (var i=0; i<names.length; i++){
-              data[names[i]]=totals[i];
-            }
-            console.log(data);
-            drawGraph(data);
-
-        });
-
-      })
-});
+drawGraph(data);
 
 function type(d) {
   d.value= +d.value;
@@ -217,9 +126,28 @@ function getDescendants(uberon, callback) {
         for (var i = 0; i < json.results.length; i++) {
             uberon = json.results[i]['@id'];
             descendants.push(uberon)
-                //console.log('Taxa url rank: ', taxa);
+                console.log('Descendant uberon: '+ uberon);
         }
         callback(descendants);
+    });
+}
+
+/**function gets children
+Parameter: uberon number
+returns urls of the children **/
+function getChild(uberon,callback){
+  children=[];
+  var urlBase='http://kb.phenoscape.org/api/term/classification?iri=http://purl.obolibrary.org/obo/UBERON_'+uberon
+  $.getJSON(urlBase, function(json) {
+    for (var i= 0; i<json.superClassOf.length; i++){
+      var child = json.superClassOf[i]['@id'];
+      if (child.length>5){
+        children.push(child);
+        console.log('Child: '+child);
+      }
+    }
+        
+        callback(children);
     });
 }
 
@@ -227,7 +155,7 @@ function getDescendants(uberon, callback) {
 function getName(purlURL,callback){
   var url='http://kb.phenoscape.org/api/term?iri='+purlURL
   $.getJSON(url, function(json) {
-        console.log(json.label);
+        //console.log(json.label);
         callback(json.label);
       });
 }
@@ -243,6 +171,32 @@ function getMax(data){
   }
   return max;
 
+}
+
+//function populates names and totals array
+//Parameter: descArray is array of descendants
+function populateArrays(descArray, callback){
+  var names=[];
+  var totals=[];
+  for (var i=0; i<descArray.length; i++){
+    getName(descArray[i], function(name){
+      names[i]=name;
+    });
+    get_total(getUberon(descArray[i]), function(total){
+      totals[i]=total;
+    });
+  }
+  callback(names,totals);
+}
+
+//Parameters: names-array of anatomy names
+// totals: array of total counts
+function populateData(names,totals){
+  var data=[];
+  for (var i=0; i<names.length; i++){
+    data[names[i]]=totals[i];
+  }
+  return data;
 }
 
 //to update graph every time
@@ -313,19 +267,73 @@ svg.call(tip);
       .on('click',function(d,i){
         //get new data
         //get descendants
-        data=[];
+        d3.selectAll("svg").remove();
+        var data=[];
+        /**
         get_uberon(d.key, function(uberon){
-          getDescendants(uberon, function(d){
-            for (var desc in d){
-              data[getName(desc)]=get_total(getUberon(desc));
-              if (Object.keys(data).length==d.length){
-                drawGraph(data);
+          getChild(uberon, function(d){
+            for (var i in d){
+              console.log("Desc: "+i);
+              get_total(getUberon(d[i]),function(total){
+                getName(d[i],function(name){
+                  data[name]=total;
+                  console.log(name+":"+total);
+                  
+                })
+              });
+            }**/
+            //ASK ABOUT PROMISES
+            var promise = new Promise(function(resolve, reject){
+              get_uberon(d.key, function(uberon){
+              getChild(uberon, function(d){
+              for (var i in d){
+                console.log("Desc: "+i);
+                get_total(getUberon(d[i]),function(total){
+                  getName(d[i],function(name){
+                    data[name]=total;
+                    console.log(name+":"+total);
+                    console.log("data length: "+data.length);
+                    console.log("d length: "+d.length);
+                  })
+                });
               }
-            }
+            }) 
           });
-        });
+              if (Object.keys(data).length==d.length){
+                resolve(data);
+              }else {
+                reject("Failure!");
+              }
+        }); 
+
+        promise.then(function(result){
+          console.log(result);
+          drawGraph(result);
+        }, function(err){
+          console.log("Failed!",err);
+        })
+
       });
 //});
 }
+
+/**
+//parameter d is the array of child uberon urls
+function populate(d,callback){
+  for (var desc in d){
+    console.log("Desc: "+desc);
+    get_total(getUberon(d[desc]),function(total){
+      getName(d[desc],function(name){
+        data[name]=total;
+        console.log(name+":"+total);
+        console.log("Data: "+data);
+        //drawGraph(data);
+      })
+    });
+  }
+  callback(data);
+});
+}
+**/
 
 </script>
