@@ -230,6 +230,7 @@ function drawGraph(data) {
   .on('click', function(d, i) {
     //get new data
     //get descendants
+    tip.hide()
     d3.selectAll("svg").remove();
     d3.selectAll("tip").remove();
     /**
