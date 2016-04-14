@@ -23,11 +23,23 @@ function get_total(url, callback) {
 		callback(count);
 	});
 }
+var csv = new Promise(function(resolve, reject) {
+	d3.csv("VTO.csv", function(data) {
+		resolve(data);
+	});
+});
+
 //gets url from VTO.csv file
 function get_url(nameOfTaxa, callback) {
 	//find VTO of taxa
-	d3.csv("VTO.csv", function(data) {
+	return csv.then(function(data) {
 		for (var i = 0; i < data.length; i++) {
+			var termP = data[i].Parent_label;
+			if (termP.toUpperCase() == nameOfTaxa.toUpperCase()) {
+				var aurl = data[i].ParentTermIRI;
+				//console.log(aurl);
+				callback(aurl);
+			}
 			var term = data[i].Term_label;
 			if (term.toUpperCase() == nameOfTaxa.toUpperCase()) {
 				var aurl = data[i].TermIRI;
@@ -37,19 +49,12 @@ function get_url(nameOfTaxa, callback) {
 			}
 			//j=j+1;
 		}
-		for (var i = 0; i < data.length; i++) {
-			var termP = data[i].Parent_label;
-			if (termP.toUpperCase() == nameOfTaxa.toUpperCase()) {
-				var aurl = data[i].ParentTermIRI;
-				//console.log(aurl);
-				callback(aurl);
-			}
-		}
-	});
-	return;
+		return aurl;
+	})
 }
 
 //function gets all of the urls of the taxa within the rank of a specific super-taxon. Parameter VTO is the url of the super taxon.
+//returns array of all the taxa
 function getTaxaInRank(VTO, callback) {
 	var allTaxainRank = [];
 	var taxaUrl = 'http://kb.phenoscape.org/api/taxon/with_rank?rank=http://purl.obolibrary.org/obo/TAXRANK_0000003&in_taxon=' + VTO
@@ -66,6 +71,23 @@ function getTaxaInRank(VTO, callback) {
 		callback(allTaxainRank);
 	});
 
+}
+
+//replacement function for getTaxaInRank 
+function getChild(VTO, callback) {
+	var allTaxa = [];
+	var urlBase = 'http://kb.phenoscape.org/api/term/classification?iri=http://purl.obolibrary.org/obo/TAXRANK_' + VTO
+	$.getJSON(urlBase, function(json) {
+		for (var i = 0; i < json.superClassOf.length; i++) {
+			var child = json.superClassOf[i]['@id'];
+			if (child.length > 5 && child.length < 100) {
+				allTaxa.push(child);
+				//console.log('Child: ' + child);
+			}
+		}
+
+		callback(allTaxa);
+	});
 }
 
 //get name of taxa using the VTO URL
@@ -237,20 +259,23 @@ function drawGraph(data) {
 		        })
 		      });
 		    }**/
-		//ASK ABOUT PROMISES
+
+		console.log("Clicked");
 		var promise = new Promise(function(resolve, reject) {
 			var data = [];
 			get_url(d.key, function(VTOurl) { //get the VTO url from the taxa clicked
+				//console.log(VTOurl);
 				getTaxaInRank(VTOurl, function(d) {
+					//console.log(d);
 					for (var i in d) { //iterate through array of subtaxa
-						console.log("d!" + d);
-						console.log("subtaxa: " + i);
+						//console.log("d!" + d);
+						//console.log("subtaxa: " + i);
 						get_total(d[i], function(i, total) {
 							getName(d[i], function(name) {
 								data[name] = total;
-								console.log(name + ": " + total);
-								console.log("data length: " + data.length);
-								console.log("d length: " + d.length);
+								//console.log(name + ": " + total);
+								//console.log("data length: " + data.length);
+								//console.log("d length: " + d.length);
 								if (Object.keys(data).length == d.length) {
 									resolve(data);
 								}
@@ -259,7 +284,7 @@ function drawGraph(data) {
 					}
 				})
 			});
-			setTimeout(resolve.bind(null, data), 2000);
+			setTimeout(reject.bind(null, data), 10000);
 			//
 		});
 
@@ -267,6 +292,7 @@ function drawGraph(data) {
 			console.log(result);
 			drawGraph(result);
 		}, function(err) {
+			drawGraph(err);
 			console.log("Failed!", err);
 		})
 
