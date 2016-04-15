@@ -1,11 +1,12 @@
 var counts = [];
 
 var data = {
-	'amniota': 326,
-	'synapsida': 138,
-	'therapsida': 98,
-	'eupelycosauria': 26,
-	'pelycosauria': 13
+	'amphibia': 644,
+	'Reptiliomorpha': 352,
+	'Densignathus': 1,
+	'Westlothiana': 1,
+	'Whatcheeriidae': 4,
+	'Elginerpeton': 1
 };
 
 
@@ -53,7 +54,7 @@ function get_url(nameOfTaxa, callback) {
 	})
 }
 
-//function gets all of the urls of the taxa within the rank of a specific super-taxon. Parameter VTO is the url of the super taxon.
+/*//function gets all of the urls of the taxa within the rank of a specific super-taxon. Parameter VTO is the url of the super taxon.
 //returns array of all the taxa
 function getTaxaInRank(VTO, callback) {
 	var allTaxainRank = [];
@@ -72,18 +73,19 @@ function getTaxaInRank(VTO, callback) {
 	});
 
 }
-
-//replacement function for getTaxaInRank 
-function getChild(VTO, callback) {
+*/
+//replacement function for getTaxaInRank using classification
+//@parameter VTO is the url 
+function getTaxaInRank(VTO, callback) {
 	var allTaxa = [];
-	var urlBase = 'http://kb.phenoscape.org/api/term/classification?iri=http://purl.obolibrary.org/obo/TAXRANK_' + VTO
+	var urlBase = 'http://kb.phenoscape.org/api/term/classification?iri=' + VTO
 	$.getJSON(urlBase, function(json) {
 		for (var i = 0; i < json.superClassOf.length; i++) {
 			var child = json.superClassOf[i]['@id'];
-			if (child.length > 5 && child.length < 100) {
-				allTaxa.push(child);
-				//console.log('Child: ' + child);
-			}
+			//if (child.length > 5 && child.length < 100) {
+			allTaxa.push(child);
+			console.log('Child: ' + child);
+			//}
 		}
 
 		callback(allTaxa);
@@ -98,29 +100,25 @@ function getName(VTOurl, callback) {
 		callback(json.label);
 	});
 }
+/**
+var taxaBaseNames = ['Amniota', 'Tetrapoda', 'Hominoidea', 'Carnivora'];
+var taxaData = [];
+//test the functions
+for (var i = 0; i < taxaBaseNames.length; i++) {
+	get_url(taxaBaseNames[i], function(url) {
+		// get array of all the taxa in the super-taxa
+		getTaxaInRank(url, function(subTaxa) {
+			console.log(subTaxa);
+		});
+		get_total(url, function(total) {
+			//store total count into array
+			taxaData[taxaBaseNames[i]] = total;
+			console.log(total);
+		})
+	}); //UNDEFINED
 
-getName('http://purl.obolibrary.org/obo/VTO_9022752', function(d) {
-		console.log(d);
-	})
-	/**
-	var taxaBaseNames = ['Amniota', 'Tetrapoda', 'Hominoidea', 'Carnivora'];
-	var taxaData = [];
-	//test the functions
-	for (var i = 0; i < taxaBaseNames.length; i++) {
-		get_url(taxaBaseNames[i], function(url) {
-			// get array of all the taxa in the super-taxa
-			getTaxaInRank(url, function(subTaxa) {
-				console.log(subTaxa);
-			});
-			get_total(url, function(total) {
-				//store total count into array
-				taxaData[taxaBaseNames[i]] = total;
-				console.log(total);
-			})
-		}); //UNDEFINED
-
-	}
-	**/
+}
+**/
 
 //parameter: data is an associative array
 function getMax(data) {
@@ -263,11 +261,13 @@ function drawGraph(data) {
 		console.log("Clicked");
 		var promise = new Promise(function(resolve, reject) {
 			var data = [];
+			console.log(d.key);
 			get_url(d.key, function(VTOurl) { //get the VTO url from the taxa clicked
-				//console.log(VTOurl);
+				console.log(VTOurl);
 				getTaxaInRank(VTOurl, function(d) {
 					//console.log(d);
 					for (var i in d) { //iterate through array of subtaxa
+						//console.log(i);
 						//console.log("d!" + d);
 						//console.log("subtaxa: " + i);
 						get_total(d[i], function(i, total) {
