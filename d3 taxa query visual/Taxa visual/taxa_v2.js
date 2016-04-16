@@ -1,11 +1,11 @@
 //base case data
 var data = {
-	'Amphibia': 644,
-	'Reptiliomorpha': 352,
-	'Densignathus': 1,
-	'Westlothiana': 1,
-	'Whatcheeriidae': 4,
-	'Elginerpeton': 1
+	'Amphibia': [644,'http://purl.obolibrary.org/obo/VTO_0001466'],
+	'Reptiliomorpha': [352,'http://purl.obolibrary.org/obo/VTO_9000177'],
+	'Densignathus': [1,'http://purl.obolibrary.org/obo/VTO_9022020'],
+	'Westlothiana': [1,'http://purl.obolibrary.org/obo/VTO_9031046'],
+	'Whatcheeriidae': [4,'http://purl.obolibrary.org/obo/VTO_9031049'],
+	'Elginerpeton': [1,'http://purl.obolibrary.org/obo/VTO_9032382']
 };
 
 var margin = {
@@ -31,57 +31,7 @@ function get_total(url, callback) {
 		callback(count);
 	});
 }
-var csv = new Promise(function(resolve, reject) {
-	d3.csv("VTO.csv", function(data) {
-		resolve(data);
-	});
-});
-
-//gets url from VTO.csv file
-function get_url(nameOfTaxa, callback) {
-	//find VTO of taxa
-	return csv.then(function(data) {
-		for (var i = 0; i < data.length; i++) {
-			var termP = data[i].Parent_label;
-			if (termP.toUpperCase() == nameOfTaxa.toUpperCase()) {
-				var aurl = data[i].ParentTermIRI;
-				//console.log(aurl);
-				callback(aurl);
-			}
-			var term = data[i].Term_label;
-			if (term.toUpperCase() == nameOfTaxa.toUpperCase()) {
-				var aurl = data[i].TermIRI;
-				//console.log(aurl);
-				//console.log(typeof(aurl));
-				callback(aurl);
-			}
-			//j=j+1;
-		}
-		return aurl;
-	})
-}
-
-/*//function gets all of the urls of the taxa within the rank of a specific super-taxon. Parameter VTO is the url of the super taxon.
-//returns array of all the taxa
-function getTaxaInRank(VTO, callback) {
-	var allTaxainRank = [];
-	var taxaUrl = 'http://kb.phenoscape.org/api/taxon/with_rank?rank=http://purl.obolibrary.org/obo/TAXRANK_0000003&in_taxon=' + VTO
-	console.log("TaxaUrl: " + taxaUrl);
-	$.getJSON(taxaUrl, function(json) {
-		taxa = json.results[1]['@id']; //how to get json element?!
-		if (json.results[1] !== undefined && taxa !== undefined) {
-			for (var i = 0; i < json.results.length; i++) {
-				taxa = json.results[i]['@id'];
-				allTaxainRank.push(taxa)
-					//console.log('Taxa url rank: ', taxa);
-			}
-		}
-		callback(allTaxainRank);
-	});
-
-}
-*/
-//replacement function for getTaxaInRank using classification
+//function for getTaxaInRank using classification
 //@parameter VTO is the url 
 function getTaxaInRank(VTO, callback) {
 	var allTaxa = [];
@@ -108,13 +58,14 @@ function getName(VTOurl, callback) {
 	});
 }
 
+
 //parameter: data is an associative array
 function getMax(data) {
 	//TODO
 	var max = 0;
 	for (var key in data) {
-		if (data[key] > max) {
-			max = data[key];
+		if (data[key][0] > max) {
+			max = data[key][0];
 		}
 	}
 	return max;
@@ -137,12 +88,12 @@ function populateArrays(descArray, callback) {
 	callback(names, totals);
 }
 
-//Parameters: names-array of anatomy names
+//Parameters: names-array of anatomy names, array of taxa-in-rank urls
 // totals: array of total counts
-function populateData(names, totals) {
+function populateData(names, totals, allTaxa) {
 	var data = [];
 	for (var i = 0; i < names.length; i++) {
-		data[names[i]] = totals[i];
+		data[names[i]] = [totals[i], allTaxa[i]];
 	}
 	return data;
 }
@@ -174,7 +125,7 @@ function drawGraph(data) {
 		.attr('class', 'd3-tip')
 		.offset([-10, 0])
 		.html(function(d) {
-			return d.key + "<br/>" + "Annontated taxa count: " + d.value;
+			return d.key + "<br/>" + "Annontated taxa count: " + d3.values(d)[1][0];
 		})
 
 	var svg = d3.select("body").append("svg")
@@ -217,11 +168,10 @@ function drawGraph(data) {
 		})
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) {
-			console.log(d.value);
-			return y(d.value);
+			return y(d3.values(d)[1][0]);
 		})
 		.attr("height", function(d) {
-			return height - y(d.value);
+			return height - y(d3.values(d)[1][0]);
 		})
 		.on('mouseover', tip.show)
 		.on('mouseout', tip.hide)
@@ -236,24 +186,15 @@ function drawGraph(data) {
 		d3.select("svg").remove();
 		d3.selectAll("tip").remove();
 
-		console.log("Clicked");
 		var promise = new Promise(function(resolve, reject) {
 			var data = [];
-			//console.log(d.key);
-			get_url(d.key, function(VTOurl) { //get the VTO url from the taxa clicked
-				//console.log(VTOurl);
+			VTOurl=d3.values(d)[1][1]; //HERE
 				getTaxaInRank(VTOurl, function(d) {
 					//console.log(d);
 					for (var i in d) { //iterate through array of subtaxa
-						//console.log(i);
-						//console.log("d!" + d);
-						//console.log("subtaxa: " + i);
 						get_total(d[i], function(i, total) {
 							getName(d[i], function(name) {
-								data[name] = total;
-								//console.log(name + ": " + total);
-								//console.log("data length: " + data.length);
-								//console.log("d length: " + d.length);
+								data[name] = [total,d[i]];
 								if (Object.keys(data).length == d.length) {
 									resolve(data);
 								}
@@ -261,7 +202,7 @@ function drawGraph(data) {
 						}.bind(null, i));
 					}
 				})
-			});
+			//});
 			setTimeout(reject.bind(null, data), 10000);
 			//
 		});
