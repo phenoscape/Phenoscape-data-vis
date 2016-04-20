@@ -196,7 +196,7 @@ function drawGraph(data) {
 	svg.append("g")
 		.attr("class", "x axis")
 		.attr("transform", "translate(0," + height + ")")
-		//.call(xAxis); //Creates x axis label
+		//.call(xAxis); //Creates x axis labels
 
 	var yLine = svg.append("g")
 		.attr("class", "y axis")
