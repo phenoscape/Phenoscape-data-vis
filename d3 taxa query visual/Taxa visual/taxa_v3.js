@@ -1,11 +1,13 @@
 //base case data
 var data = {
-	'Amphibia': [644, 'http://purl.obolibrary.org/obo/VTO_0001466'],
-	'Reptiliomorpha': [352, 'http://purl.obolibrary.org/obo/VTO_9000177'],
-	'Densignathus': [1, 'http://purl.obolibrary.org/obo/VTO_9022020'],
-	'Westlothiana': [1, 'http://purl.obolibrary.org/obo/VTO_9031046'],
-	'Whatcheeriidae': [4, 'http://purl.obolibrary.org/obo/VTO_9031049'],
-	'Elginerpeton': [1, 'http://purl.obolibrary.org/obo/VTO_9032382']
+	'Myxiniformes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701'],
+	'Petromyzontiformes': [6, 'http://purl.obolibrary.org/obo/VTO_0058622'],
+	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
+	'Chondrichthyes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
+	'Placodermi': [24, 'http://purl.obolibrary.org/obo/VTO_9012172'],
+	'Acanthodii': [31, 'http://purl.obolibrary.org/obo/VTO_9011043'],
+	'Actinopterygii':[3741,'http://purl.obolibrary.org/obo/VTO_0033622'],
+	'Sarcopterygii':[1078,'http://purl.obolibrary.org/obo/VTO_0001464']
 };
 
 var phenoBlue = d3.rgb(66, 139, 202);
@@ -128,9 +130,9 @@ function drawGraph(data) {
 		.call(yAxis)
 		.append("text")
 		.attr("transform", "rotate(-90)")
-		.attr("y", -40)
+		.attr("y", -50)
 		.attr("dy", ".71em")
-		.style("text-anchor", "end")
+		.style("text-anchor", "middle")
 		.text("Annotated Taxa Count");
 
 	var bars = svg.selectAll(".bar")
@@ -173,7 +175,7 @@ function drawGraph(data) {
 
 		promise.then(function(result) {
 			removeEverything(tip);
-			console.log(result);
+			//console.log(result);
 			drawGraph(result);
 		}, function(err) {
 			alert("No more descending possible")
