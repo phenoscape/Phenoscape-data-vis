@@ -1,7 +1,7 @@
 //base case data
 var data = {
 	'Myxiniformes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701'],
-	'Petromyzontiformes': [6, 'http://purl.obolibrary.org/obo/VTO_0058622'],
+	'Lampreys': [6, 'http://purl.obolibrary.org/obo/VTO_0058622'],
 	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
 	'Chondrichthyes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
 	'Placodermi': [24, 'http://purl.obolibrary.org/obo/VTO_9012172'],
@@ -50,11 +50,21 @@ function getTaxaInRank(VTO, callback) {
 
 //get name of taxa using the VTO URL
 function getName(VTOurl, callback) {
-	var url = 'http://kb.phenoscape.org/api/term?iri=' + VTOurl
+	var url = 'http://kb.phenoscape.org/api/taxon?iri=' + VTOurl
 	$.getJSON(url, function(json) {
-		callback(json.label);
+		if (json.common_name==null){
+			callback(json.label);
+		}
+		else {
+			console.log(json.common_name);
+			callback(json.common_name);
+		}
 	});
 }
+
+getName('http://purl.obolibrary.org/obo/VTO_0058622', function(d){
+	console.log(d);
+})
 
 //@data is an object
 function getMax(data) {
