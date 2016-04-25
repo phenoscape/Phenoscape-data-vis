@@ -36,6 +36,7 @@ function type(d) {
 
 //@uberon: uberon number
 function get_total(uberon, callback) {
+  //var urlBase='http://kb.phenoscape.org/api/entity/presence?entity=http:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_'+uberon+'&total=true'; //presence graph
   var urlBase = 'http://kb.phenoscape.org/api/taxon/with_phenotype?entity=%3Chttp:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_' + uberon + '%3E&total=true';
   $.getJSON(urlBase, function(json) {
     var count = json.total;

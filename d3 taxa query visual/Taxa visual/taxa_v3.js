@@ -6,12 +6,12 @@ var data = {
 	'Chondrichthyes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
 	'Placodermi': [24, 'http://purl.obolibrary.org/obo/VTO_9012172'],
 	'Acanthodii': [31, 'http://purl.obolibrary.org/obo/VTO_9011043'],
-	'Actinopterygii':[3741,'http://purl.obolibrary.org/obo/VTO_0033622'],
-	'Sarcopterygii':[1078,'http://purl.obolibrary.org/obo/VTO_0001464']
+	'Actinopterygii': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464']
 };
 
 var phenoBlue = d3.rgb(66, 139, 202);
-
+var stack = new Array(); // stores path to be able to go back
 var margin = {
 		top: 70,
 		right: 20,
@@ -70,7 +70,7 @@ function getMax(data) {
 
 //to update graph every time
 function drawGraph(data) {
-
+	stack.push(data);
 	var x = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
 		.domain(d3.entries(data).map(function(d) {
@@ -153,8 +153,14 @@ function drawGraph(data) {
 		.on('mouseover', tip.show)
 		.on('mouseout', tip.hide)
 
+	//to go back on graph
+	var svg = d3.select('button').on('click', function() {
+		removeEverything(tip);
+		drawGraph(stack.pop());
+	});
+
 	//update to get sub anatomies based on click
-	.on('click', function(d, i) {
+	bars.on('click', function(d, i) {
 		var promise = new Promise(function(resolve, reject) {
 			var dataset = [];
 			VTOurl = d3.values(d)[1][1];
@@ -222,17 +228,17 @@ function wrap(text, width) {
 	});
 }
 
-var insertLinebreaks = function (t, d, width) {
-    var el = d3.select(t);
-    var p = d3.select(t.parentNode);
-    p.append("foreignObject")
-        .attr('x', -width/2)
-        .attr("width", width)
-        .attr("height", 200)
-      .append("xhtml:p")
-        .attr('style','word-wrap: break-word; text-align:center;')
-        .html(d);    
+var insertLinebreaks = function(t, d, width) {
+	var el = d3.select(t);
+	var p = d3.select(t.parentNode);
+	p.append("foreignObject")
+		.attr('x', -width / 2)
+		.attr("width", width)
+		.attr("height", 200)
+		.append("xhtml:p")
+		.attr('style', 'word-wrap: break-word; text-align:center;')
+		.html(d);
 
-    el.remove();
+	el.remove();
 
 };
