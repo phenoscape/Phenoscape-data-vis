@@ -1,13 +1,13 @@
 //base case data
 var data = {
-	'Myxiniformes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701'],
+	'Hagfishes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701'],
 	'Lampreys': [6, 'http://purl.obolibrary.org/obo/VTO_0058622'],
-	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
-	'Chondrichthyes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
 	'Placodermi': [24, 'http://purl.obolibrary.org/obo/VTO_9012172'],
 	'Acanthodii': [31, 'http://purl.obolibrary.org/obo/VTO_9011043'],
-	'Actinopterygii': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464']
+	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
+	'Cartilaginous fishes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
+	'Ray-finned fishes': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622']
 };
 
 var phenoBlue = d3.rgb(66, 139, 202);
@@ -15,7 +15,7 @@ var stack = new Array(); // stores path to be able to go back
 var margin = {
 		top: 70,
 		right: 20,
-		bottom: 80,
+		bottom: 100,
 		left: 60
 	},
 	width = 960 - margin.left - margin.right,
@@ -48,23 +48,17 @@ function getTaxaInRank(VTO, callback) {
 	});
 }
 
-//get name of taxa using the VTO URL
+//get common English name (if available) or Latin name of taxa using the VTO URL
 function getName(VTOurl, callback) {
 	var url = 'http://kb.phenoscape.org/api/taxon?iri=' + VTOurl
 	$.getJSON(url, function(json) {
-		if (json.common_name==null){
+		if (json.common_name == null) {
 			callback(json.label);
-		}
-		else {
-			console.log(json.common_name);
+		} else {
 			callback(json.common_name);
 		}
 	});
 }
-
-getName('http://purl.obolibrary.org/obo/VTO_0058622', function(d){
-	console.log(d);
-})
 
 //@data is an object
 function getMax(data) {
@@ -165,8 +159,14 @@ function drawGraph(data) {
 
 	//to go back on graph
 	var svg = d3.select('button').on('click', function() {
-		removeEverything(tip);
-		drawGraph(stack.pop());
+		console.log(stack.length);
+		if (stack.length == 1) {
+			alert("Can't go back anymore");
+		} else {
+			removeEverything(tip);
+			console.log(stack.pop());
+			drawGraph(stack.pop());
+		}
 	});
 
 	//update to get sub anatomies based on click
