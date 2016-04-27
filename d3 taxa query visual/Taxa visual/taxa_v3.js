@@ -6,8 +6,13 @@ var data = {
 	'Acanthodii': [31, 'http://purl.obolibrary.org/obo/VTO_9011043'],
 	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
 	'Cartilaginous fishes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
+	'Ray-finned fishes': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622'],
 	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
-	'Ray-finned fishes': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622']
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464']
 };
 
 var phenoBlue = d3.rgb(66, 139, 202);
@@ -74,10 +79,13 @@ function getMax(data) {
 
 //to update graph every time
 function drawGraph(data) {
+	console.log('Ouwen:', data);
+	sortDescending(data);
 	stack.push(data);
+	console.log('this will ignore sorting:', d3.entries(data));
 	var x = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
-		.domain(d3.entries(data).map(function(d) {
+		.domain(sortDescending(data).map(function(d) {
 			return d.key
 		}));
 
@@ -204,6 +212,20 @@ function drawGraph(data) {
 
 }
 
+/**------functions for graphing-----------------**/
+
+function ifOne(data){
+	if (data.length==1){
+		
+	}
+}
+
+function sortDescending(data) {
+	return d3.entries(data).sort(function(a, b) {
+		return d3.values(b)[1][0] - d3.values(a)[1][0];
+	});
+}
+
 /**
 Removes all elements of graph
 @tip: tooltip object
@@ -214,6 +236,7 @@ function removeEverything(tip) {
 	d3.selectAll("tip").remove();
 }
 
+//Wrap the text
 function wrap(text, width) {
 	text.each(function() {
 		var text = d3.select(this),
