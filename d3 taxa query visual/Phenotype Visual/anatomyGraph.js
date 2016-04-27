@@ -16,13 +16,13 @@ var data = {
 var phenoBlue = d3.rgb(66, 139, 202);
 
 var margin = {
-      top: 70,
-      right: 20,
-      bottom: 90,
-      left: 60
-    },
-    width = 960 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+    top: 70,
+    right: 20,
+    bottom: 90,
+    left: 60
+  },
+  width = 960 - margin.left - margin.right,
+  height = 600 - margin.top - margin.bottom;
 
 drawGraph(data);
 
@@ -70,6 +70,26 @@ function getChild(uberonURL, callback) {
   });
 }
 
+/**
+Returns array of all of the immediate parts of a specific anatomy 
+identified by uberon
+**/ 
+function getPartOf(uberonURL, callback) {
+  var children=[];
+  var urlBase = 'http://kb.phenoscape.org/api/term/property_neighbors/object?term=' + uberonURL + '&property=http://purl.obolibrary.org/obo/BFO_0000050'
+  $.getJSON(urlBase, function(json) {
+    for (var i = 0; i < json.results.length; i++) {
+      var child = json.results[i]['@id'];
+      if (child.length > 5 && child.length < 100) {
+        children.push(child);
+        console.log('Child: ' + child);
+      }
+    }
+
+    callback(children);
+  });
+}
+
 //get name of anatomy using the purl URL
 function getName(purlURL, callback) {
   var url = 'http://kb.phenoscape.org/api/term?iri=' + purlURL
@@ -104,7 +124,7 @@ function drawGraph(data) {
     .domain([0, getMax(data)])
     .range([height, 0]);
 
-  console.log("Max: "+getMax(data));
+  console.log("Max: " + getMax(data));
   var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom");
@@ -141,7 +161,7 @@ function drawGraph(data) {
     .attr("transform", "rotate(45)")
     .style("text-anchor", "start");
 
-  var yLine=svg.append("g")
+  var yLine = svg.append("g")
     .attr("class", "y axis")
     .call(yAxis)
     .append("text")
@@ -151,7 +171,7 @@ function drawGraph(data) {
     .style("text-anchor", "end")
     .text("Annotated Taxa Count");
 
-  var bars=svg.selectAll(".bar")
+  var bars = svg.selectAll(".bar")
     .data(d3.entries(data))
     .enter().append("rect")
     .attr("fill", phenoBlue)
@@ -173,11 +193,11 @@ function drawGraph(data) {
   .on('click', function(d, i) {
     //get new data
     //get descendants
-  
+
     var promise = new Promise(function(resolve, reject) {
       var dataset = [];
       uberonURL = d3.values(d)[1][1];
-      getChild(uberonURL, function(d) { //get descendants
+      getPartOf(uberonURL, function(d) { //get descendants
         console.log(d);
         for (var i in d) {
           get_total(getUberon(d[i]), function(i, total) {
