@@ -103,7 +103,7 @@ function drawGraph(data) {
 		.attr('class', 'd3-tip')
 		.offset([-10, 0])
 		.html(function(d) {
-			return d.key + "<br/>" + "Annontated taxa count: " + d3.values(d)[1][0];
+			return d.key + "<br/>" + "Annontated Taxa Count: " + d3.values(d)[1][0];
 		})
 
 	var svg = d3.select("body").append("svg")

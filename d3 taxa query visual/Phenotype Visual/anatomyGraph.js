@@ -12,14 +12,14 @@ var data = {
   'ventral hyoid arch skeleton': [284, 'http://purl.obolibrary.org/obo/UBERON_0011153'],
   'post-cranial axial skeletal system': [0, 'http://purl.obolibrary.org/obo/UBERON_0011138']
 };
-
+var stack = new Array(); // stores path to be able to go back
 var phenoBlue = d3.rgb(66, 139, 202);
 
 var margin = {
     top: 70,
-    right: 20,
-    bottom: 90,
-    left: 60
+    right: 50,
+    bottom: 150,
+    left: 30
   },
   width = 960 - margin.left - margin.right,
   height = 600 - margin.top - margin.bottom;
@@ -82,7 +82,7 @@ function getPartOf(uberonURL, callback) {
       var child = json.results[i]['@id'];
       if (child.length > 5 && child.length < 100) {
         children.push(child);
-        console.log('Child: ' + child);
+        //console.log('Child: ' + child);
       }
     }
 
@@ -114,9 +114,10 @@ function getMax(data) {
 
 //to update graph every time
 function drawGraph(data) {
+  stack.push(data);
   var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1)
-    .domain(d3.entries(data).map(function(d) {
+    .domain(sortDescending(data).map(function(d) {
       return d.key
     }));
 
@@ -138,7 +139,7 @@ function drawGraph(data) {
     .attr('class', 'd3-tip')
     .offset([-10, 0])
     .html(function(d) {
-      return d.key + "<br/>" + "Annontated taxa count: " + d3.values(d)[1][0];
+      return d.key + "<br/>" + "Annontated Taxa Count: " + d3.values(d)[1][0];
     })
 
   var svg = d3.select("body").append("svg")
@@ -155,9 +156,11 @@ function drawGraph(data) {
     .call(xAxis);
 
   svg.selectAll("text")
-    .call(wrap, x.rangeBand())
-    .attr("y", 0)
-    .attr("x", 50)
+    //.call(wrap, x.rangeBand())
+    //.attr("y", 10)
+    //.attr("x", 50)
+    .attr("dx", "-.8em")
+    .attr("dy", ".70em")
     .attr("transform", "rotate(45)")
     .style("text-anchor", "start");
 
@@ -166,7 +169,7 @@ function drawGraph(data) {
     .call(yAxis)
     .append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 6)
+    .attr("y", -50)
     .attr("dy", ".71em")
     .style("text-anchor", "end")
     .text("Annotated Taxa Count");
@@ -189,15 +192,26 @@ function drawGraph(data) {
     .on('mouseover', tip.show)
     .on('mouseout', tip.hide)
 
+//to go back on graph
+  var svg = d3.select('button').on('click', function() {
+    //console.log(stack.length);
+    if (stack.length == 1) {
+      alert("Can't go back anymore");
+    } else {
+      removeEverything(tip);
+      console.log(stack.pop());
+      drawGraph(stack.pop());
+    }
+  });
   //update to get sub anatomies based on click
-  .on('click', function(d, i) {
+  bars.on('click', function(d, i) {
     //get new data
-    //get descendants
+    //get immediate parts
 
     var promise = new Promise(function(resolve, reject) {
       var dataset = [];
       uberonURL = d3.values(d)[1][1];
-      getPartOf(uberonURL, function(d) { //get descendants
+      getPartOf(uberonURL, function(d) { //get parts
         console.log(d);
         for (var i in d) {
           get_total(getUberon(d[i]), function(i, total) {
@@ -229,6 +243,12 @@ function drawGraph(data) {
 
 }
 
+function sortDescending(data) {
+  return d3.entries(data).sort(function(a, b) {
+    return d3.values(b)[1][0] - d3.values(a)[1][0];
+  });
+}
+
 function removeEverything(tip) {
   tip.hide()
   d3.select("svg").remove();
@@ -242,7 +262,7 @@ function wrap(text, width) {
       word,
       line = [],
       lineNumber = 0,
-      lineHeight = 1.1, // ems
+      lineHeight = .85, // ems
       y = text.attr("y"),
       dy = parseFloat(text.attr("dy")),
       tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
