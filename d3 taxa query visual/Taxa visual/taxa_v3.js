@@ -79,10 +79,7 @@ function getMax(data) {
 
 //to update graph every time
 function drawGraph(data) {
-	console.log('Ouwen:', data);
-	sortDescending(data);
 	stack.push(data);
-	console.log('this will ignore sorting:', d3.entries(data));
 	var x = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
 		.domain(sortDescending(data).map(function(d) {
