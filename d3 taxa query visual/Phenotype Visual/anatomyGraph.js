@@ -212,7 +212,9 @@ function drawGraph(data) {
       var dataset = [];
       uberonURL = d3.values(d)[1][1];
       getPartOf(uberonURL, function(d) { //get parts
-        console.log(d);
+        if (d.length==0){
+          alert("No more descending possible");
+        }
         for (var i in d) {
           get_total(getUberon(d[i]), function(i, total) {
             getName(d[i], function(name) {

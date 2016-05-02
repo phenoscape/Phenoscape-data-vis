@@ -7,11 +7,6 @@ var data = {
 	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
 	'Cartilaginous fishes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
 	'Ray-finned fishes': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464'],
 	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464']
 };
 
@@ -53,7 +48,7 @@ function getTaxaInRank(VTO, callback) {
 	});
 }
 
-//get common English name (if available) or Latin name of taxa using the VTO URL
+//get common English name (if available) 
 function getName(VTOurl, callback) {
 	var url = 'http://kb.phenoscape.org/api/taxon?iri=' + VTOurl
 	$.getJSON(url, function(json) {
@@ -211,9 +206,9 @@ function drawGraph(data) {
 
 /**------functions for graphing-----------------**/
 
-function ifOne(data){
-	if (data.length==1){
-		
+function ifOne(data) {
+	if (data.length == 1) {
+
 	}
 }
 
