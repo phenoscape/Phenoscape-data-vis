@@ -19,7 +19,7 @@ var margin = {
     top: 70,
     right: 50,
     bottom: 150,
-    left: 30
+    left: 50
   },
   width = 960 - margin.left - margin.right,
   height = 600 - margin.top - margin.bottom;

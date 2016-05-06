@@ -141,7 +141,7 @@ function drawGraph(data) {
 		.attr("transform", "rotate(-90)")
 		.attr("y", -50)
 		.attr("dy", ".71em")
-		.style("text-anchor", "middle")
+		.style("text-anchor", "end")
 		.text("Annotated Taxa Count");
 
 	var bars = svg.selectAll(".bar")
@@ -196,7 +196,7 @@ function drawGraph(data) {
 
 		promise.then(function(result) {
 			removeEverything(tip);
-			console.log(result);
+			//console.log(result);
 			drawGraph(result);
 		}, function(err) {
 			alert("No more descending possible")
