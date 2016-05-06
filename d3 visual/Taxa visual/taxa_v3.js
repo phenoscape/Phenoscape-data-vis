@@ -1,13 +1,13 @@
 //base case data
 var data = {
-	'Hagfishes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701'],
-	'Lampreys': [6, 'http://purl.obolibrary.org/obo/VTO_0058622'],
-	'Placodermi': [24, 'http://purl.obolibrary.org/obo/VTO_9012172'],
-	'Acanthodii': [31, 'http://purl.obolibrary.org/obo/VTO_9011043'],
-	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758'],
-	'Cartilaginous fishes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009'],
-	'Ray-finned fishes': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622'],
-	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464']
+	'Hagfishes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701','Myxiniformes'],
+	'Lampreys': [6, 'http://purl.obolibrary.org/obo/VTO_0058622','Petromyzontiformes'],
+	'Placodermi': [24, 'http://purl.obolibrary.org/obo/VTO_9012172',''],
+	'Acanthodii': [31, 'http://purl.obolibrary.org/obo/VTO_9011043',''],
+	'Agnatha': [37, 'http://purl.obolibrary.org/obo/VTO_9032758',''],
+	'Cartilaginous fishes': [177, 'http://purl.obolibrary.org/obo/VTO_0000009','Chondrichthyes'],
+	'Ray-finned fishes': [3741, 'http://purl.obolibrary.org/obo/VTO_0033622','Actinopterygii'],
+	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464','']
 };
 
 var phenoBlue = d3.rgb(66, 139, 202);
@@ -48,14 +48,14 @@ function getTaxaInRank(VTO, callback) {
 	});
 }
 
-//get common English name (if available) 
+//get common English name (if available) and Latin name
 function getName(VTOurl, callback) {
 	var url = 'http://kb.phenoscape.org/api/taxon?iri=' + VTOurl
 	$.getJSON(url, function(json) {
 		if (json.common_name == null) {
-			callback(json.label);
+			callback(json.label, "");
 		} else {
-			callback(json.common_name);
+			callback(json.common_name, json.label);
 		}
 	});
 }
@@ -98,7 +98,12 @@ function drawGraph(data) {
 		.attr('class', 'd3-tip')
 		.offset([-10, 0])
 		.html(function(d) {
-			return d.key + "<br/>" + "Annotated Taxa Count: " + d3.values(d)[1][0];
+			if (d3.values(d)[1][2]!=""){
+				return d.key + "<br/>("+d3.values(d)[1][2]+")<br/>Annotated Taxa Count: " + d3.values(d)[1][0];
+			}else{
+				return d.key + "<br/>Annotated Taxa Count: " + d3.values(d)[1][0];
+			}
+			
 		})
 
 	var svg = d3.select("body").append("svg")
@@ -177,8 +182,8 @@ function drawGraph(data) {
 			getTaxaInRank(VTOurl, function(d) {
 				for (var i in d) { //iterate through array of subtaxa
 					get_total(d[i], function(i, total) {
-						getName(d[i], function(name) {
-							dataset[name] = [total, d[i]];
+						getName(d[i], function(name,latin) {
+							dataset[name] = [total, d[i], latin];
 							if (Object.keys(dataset).length == d.length) {
 								resolve(dataset); //new data to graph
 							}
@@ -191,7 +196,7 @@ function drawGraph(data) {
 
 		promise.then(function(result) {
 			removeEverything(tip);
-			//console.log(result);
+			console.log(result);
 			drawGraph(result);
 		}, function(err) {
 			alert("No more descending possible")
