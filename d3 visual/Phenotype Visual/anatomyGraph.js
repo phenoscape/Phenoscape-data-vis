@@ -1,16 +1,16 @@
 var data = {
-  'integumental system': [277, 'http://purl.obolibrary.org/obo/UBERON_0002416'],
-  'neurocranium': [1653, 'http://purl.obolibrary.org/obo/UBERON_0001703'],
-  'hindlimb skeleton': [0, 'http://purl.obolibrary.org/obo/UBERON_0001441'],
-  'jaw region': [0, 'http://purl.obolibrary.org/obo/UBERON_0011595'],
-  'hyoid arch skeleton': [528, 'http://purl.obolibrary.org/obo/UBERON_0005884'],
-  'forelimb skeleton': [0, 'http://purl.obolibrary.org/obo/UBERON_0001440'],
-  'fin skeleton': [313, 'http://purl.obolibrary.org/obo/UBERON_0012353'],
-  'dermatocranium': [574, 'http://purl.obolibrary.org/obo/UBERON_0003113'],
-  'pectoral girdle skeleton': [1108, 'http://purl.obolibrary.org/obo/UBERON_0007831'],
-  'pelvic girdle skeleton': [426, 'http://purl.obolibrary.org/obo/UBERON_0007832'],
-  'ventral hyoid arch skeleton': [284, 'http://purl.obolibrary.org/obo/UBERON_0011153'],
-  'post-cranial axial skeletal system': [0, 'http://purl.obolibrary.org/obo/UBERON_0011138']
+  'integumental system': [3649, 'http://purl.obolibrary.org/obo/UBERON_0002416'],
+  'neurocranium': [3230, 'http://purl.obolibrary.org/obo/UBERON_0001703'],
+  'hindlimb skeleton': [814, 'http://purl.obolibrary.org/obo/UBERON_0001441'],
+  'jaw region': [3105, 'http://purl.obolibrary.org/obo/UBERON_0011595'],
+  'hyoid arch skeleton': [3417, 'http://purl.obolibrary.org/obo/UBERON_0005884'],
+  'forelimb skeleton': [878, 'http://purl.obolibrary.org/obo/UBERON_0001440'],
+  'fin skeleton': [3662, 'http://purl.obolibrary.org/obo/UBERON_0012353'],
+  'dermatocranium': [3750, 'http://purl.obolibrary.org/obo/UBERON_0003113'],
+  'pectoral girdle skeleton': [4216, 'http://purl.obolibrary.org/obo/UBERON_0007831'],
+  'pelvic girdle skeleton': [2928, 'http://purl.obolibrary.org/obo/UBERON_0007832'],
+  'ventral hyoid arch skeleton': [2927, 'http://purl.obolibrary.org/obo/UBERON_0011153'],
+  'post-cranial axial skeletal system': [4263, 'http://purl.obolibrary.org/obo/UBERON_0011138']
 };
 var stack = new Array(); // stores path to be able to go back
 var phenoBlue = d3.rgb(66, 139, 202);
@@ -36,8 +36,8 @@ function type(d) {
 
 //@uberon: uberon number
 function get_total(uberon, callback) {
-  //var urlBase='http://kb.phenoscape.org/api/entity/presence?entity=http:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_'+uberon+'&total=true'; //presence graph
-  var urlBase = 'http://kb.phenoscape.org/api/taxon/with_phenotype?entity=%3Chttp:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_' + uberon + '%3E&total=true';
+  var urlBase='http://kb.phenoscape.org/api/taxon/with_phenotype?entity=%3Chttp://purl.obolibrary.org/obo/BFO_0000050%3E%20some%20%3Chttp://purl.obolibrary.org/obo/UBERON_'+uberon+'%3E&total=true';
+  //var urlBase = 'http://kb.phenoscape.org/api/taxon/with_phenotype?entity=%3Chttp:%2F%2Fpurl.obolibrary.org%2Fobo%2FUBERON_' + uberon + '%3E&total=true';
   $.getJSON(urlBase, function(json) {
     var count = json.total;
     callback(count);
@@ -163,6 +163,16 @@ function drawGraph(data) {
     .attr("dy", ".70em")
     .attr("transform", "rotate(45)")
     .style("text-anchor", "start");
+
+  //hyperlink the x axis labels
+  d3.selectAll("text")
+    .filter(function(d){
+      return typeof(d)=="string";
+    })
+    .style("cursor","pointer")
+    .on("click", function(d){
+      document.location.href="http://kb.phenoscape.org/#/entity/"+data[d][1];
+    });
 
   var yLine = svg.append("g")
     .attr("class", "y axis")
