@@ -134,6 +134,17 @@ function drawGraph(data) {
 		.attr("transform", "rotate(45)")
 		.style("text-anchor", "start");
 
+	//hyperlink the x axis labels
+	d3.selectAll("text")
+		.filter(function(d){
+			return typeof(d)=="string";
+		})
+		.style("cursor","pointer")
+		.on("click", function(d){
+			console.log("d: "+d);
+			document.location.href="http://kb.phenoscape.org/#/taxon/"+data[d][1];
+		});
+
 	var yLine = svg.append("g")
 		.attr("class", "y axis")
 		.call(yAxis)
