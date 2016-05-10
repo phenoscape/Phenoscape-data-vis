@@ -141,7 +141,6 @@ function drawGraph(data) {
 		})
 		.style("cursor","pointer")
 		.on("click", function(d){
-			console.log("d: "+d);
 			document.location.href="http://kb.phenoscape.org/#/taxon/"+data[d][1];
 		});
 
