@@ -51,25 +51,6 @@ function getUberon(purlUrl) {
   return uberon;
 }
 
-/**function gets children
-@uberonURL: uberon purl url 
-returns urls of the children **/
-function getChild(uberonURL, callback) {
-  children = [];
-  var urlBase = 'http://kb.phenoscape.org/api/term/classification?iri=' + uberonURL
-  $.getJSON(urlBase, function(json) {
-    for (var i = 0; i < json.superClassOf.length; i++) {
-      var child = json.superClassOf[i]['@id'];
-      if (child.length > 5 && child.length < 100) {
-        children.push(child);
-        console.log('Child: ' + child);
-      }
-    }
-
-    callback(children);
-  });
-}
-
 /**
 Returns array of all of the immediate parts of a specific anatomy 
 identified by uberon
@@ -77,6 +58,7 @@ identified by uberon
 function getPartOf(uberonURL, callback) {
   var children=[];
   var urlBase = 'http://kb.phenoscape.org/api/term/property_neighbors/object?term=' + uberonURL + '&property=http://purl.obolibrary.org/obo/BFO_0000050'
+  console.log(urlBase);
   $.getJSON(urlBase, function(json) {
     for (var i = 0; i < json.results.length; i++) {
       var child = json.results[i]['@id'];
@@ -170,6 +152,12 @@ function drawGraph(data) {
       return typeof(d)=="string";
     })
     .style("cursor","pointer")
+    .on("mouseover",function(d){
+      d3.select(this).style("fill","blue");
+    })
+    .on("mouseout",function(d){
+      d3.select(this).style("fill","black");
+    })
     .on("click", function(d){
       document.location.href="http://kb.phenoscape.org/#/entity/"+data[d][1];
     });
