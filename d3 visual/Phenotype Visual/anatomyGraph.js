@@ -208,7 +208,7 @@ function drawGraph(data) {
 
     var promise = new Promise(function(resolve, reject) {
       var dataset = [];
-      uberonURL = d3.values(d)[1][1];
+      var uberonURL = d3.values(d)[1][1];
       getPartOf(uberonURL, function(d) { //get parts
         if (d.length==0){
           alert("No more descending possible");

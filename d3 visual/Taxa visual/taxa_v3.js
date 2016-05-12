@@ -200,7 +200,7 @@ function drawGraph(data) {
 	bars.on('click', function(d, i) {
 		var promise = new Promise(function(resolve, reject) {
 			var dataset = [];
-			VTOurl = d3.values(d)[1][1];
+			var VTOurl = d3.values(d)[1][1];
 			getTaxaInRank(VTOurl, function(d) {
 				for (var i in d) { //iterate through array of subtaxa
 					get_total(d[i], function(i, total) {
