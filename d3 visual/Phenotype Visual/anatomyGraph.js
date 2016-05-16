@@ -58,13 +58,13 @@ identified by uberon
 function getPartOf(uberonURL, callback) {
   var children=[];
   var urlBase = 'http://kb.phenoscape.org/api/term/property_neighbors/object?term=' + uberonURL + '&property=http://purl.obolibrary.org/obo/BFO_0000050'
-  console.log(urlBase);
+  console.log("urlbase"+urlBase);
   $.getJSON(urlBase, function(json) {
     for (var i = 0; i < json.results.length; i++) {
       var child = json.results[i]['@id'];
       if (child.length > 5 && child.length < 100) {
         children.push(child);
-        //console.log('Child: ' + child);
+        console.log('Child: ' + child);
       }
     }
 
@@ -232,6 +232,7 @@ function drawGraph(data) {
       console.log(result);
       removeEverything(tip);
       drawGraph(result);
+      console.log("Regraphed");
     }, function(err) {
       alert("No more descending possible");
       removeEverything(tip);
