@@ -34,9 +34,9 @@ var stack_Anat = new Array(); // stores anatomy path to be able to go back
 
 var margin = {
 		top: 50,
-		right: 20,
-		bottom: 150,
-		left: 60
+		right: 100,
+		bottom: 200,
+		left: 100
 	},
 	width = 960 - margin.left - margin.right,
 	height = 600 - margin.top - margin.bottom;
@@ -45,14 +45,14 @@ var margin = {
 function createBackButton(id_name, graph_name) {
 	var btn = document.createElement("BUTTON");
 	btn.setAttribute("id", id_name);
-	var t = document.createTextNode("Go back on "+graph_name+" graph");
+	var t = document.createTextNode("Go back on " + graph_name + " graph");
 	btn.appendChild(t);
 	document.body.appendChild(btn);
 }
 
-function createGraphArea(id_name){
-	var div=document.createElement("div");
-	div.setAttribute("id",id_name);
+function createGraphArea(id_name) {
+	var div = document.createElement("div");
+	div.setAttribute("id", id_name);
 	document.body.appendChild(div);
 }
 
@@ -305,7 +305,7 @@ function drawGraph(data) {
 		.call(yAxis)
 		.append("text")
 		.attr("transform", "rotate(-90)")
-		.attr("y", -50)
+		.attr("y", -70)
 		.attr("dy", ".71em")
 		.style("text-anchor", "end")
 		.text("Annotated Taxa Count");
@@ -411,16 +411,23 @@ function drawGraph_Anat(data) {
 
 	svg1.call(tip_Anat);
 
+	svg1.append("text")
+		.attr("class", "x label")
+		.attr("text-anchor", "end")
+		.attr("x", width / 2)
+		.attr("y", height + 30)
+
+
 	svg1.append("g")
 		.attr("class", "x axis")
 		.attr("transform", "translate(0," + height + ")")
 		.call(xAxis_Anat);
 
 	svg1.selectAll("text")
-		//.call(wrap, x.rangeBand())
-		//.attr("y", 10)
-		//.attr("x", 50)
-		.attr("dx", "-.8em")
+		//.call(wrap, x_Anat.rangeBand())
+		.attr("y", 10)
+		.attr("x", 50)
+		.attr("dx", "-2.8em")
 		.attr("dy", ".70em")
 		.attr("transform", "rotate(45)")
 		.style("text-anchor", "start");
@@ -446,7 +453,7 @@ function drawGraph_Anat(data) {
 		.call(yAxis_Anat)
 		.append("text")
 		.attr("transform", "rotate(-90)")
-		.attr("y", -50)
+		.attr("y", -70)
 		.attr("dy", ".71em")
 		.style("text-anchor", "end")
 		.text("Annotated Taxa Count");
@@ -522,9 +529,9 @@ function drawGraph_Anat(data) {
 }
 
 //call the functions
-createBackButton("taxa_button","taxa");
+createBackButton("taxa_button", "taxa");
 createGraphArea("taxa");
-createBackButton("anatomy_button","anatomy");
+createBackButton("anatomy_button", "anatomy");
 createGraphArea("anatomy");
 drawGraph(data);
 drawGraph_Anat(data_Anat);
