@@ -1,5 +1,5 @@
-/**------------------Base case data-------------------------------**/
-//Taxa data
+/**-------------------------Variables-------------------------------**/
+//Taxa base case data 
 var data = {
 	'Hagfishes': [3, 'http://purl.obolibrary.org/obo/VTO_0058701', 'Myxiniformes'],
 	'Lampreys': [6, 'http://purl.obolibrary.org/obo/VTO_0058622', 'Petromyzontiformes'],
@@ -11,7 +11,7 @@ var data = {
 	'Sarcopterygii': [1078, 'http://purl.obolibrary.org/obo/VTO_0001464', '']
 };
 
-//anatomy data
+//Anatomy base case data
 var data_Anat = {
 	'integumental system': [3649, 'http://purl.obolibrary.org/obo/UBERON_0002416'],
 	'neurocranium': [3230, 'http://purl.obolibrary.org/obo/UBERON_0001703'],
@@ -27,17 +27,7 @@ var data_Anat = {
 	'post-cranial axial skeletal system': [4263, 'http://purl.obolibrary.org/obo/UBERON_0011138']
 };
 
-function createBackButton(id_name, graph_name) {
-	var btn = document.createElement("BUTTON");
-	btn.setAttribute("id", id_name);
-	var t = document.createTextNode("Go back on "+graph_name+" graph");
-	btn.appendChild(t);
-	document.body.appendChild(btn);
-}
-createBackButton("taxa_button","taxa");
-createBackButton("anatomy_button","anatomy");
-
-var phenoBlue = d3.rgb(66, 139, 202);
+var phenoBlue = d3.rgb(66, 139, 202); //main color
 
 var stack = new Array(); // stores taxa path to be able to go back
 var stack_Anat = new Array(); // stores anatomy path to be able to go back
@@ -50,6 +40,21 @@ var margin = {
 	},
 	width = 960 - margin.left - margin.right,
 	height = 600 - margin.top - margin.bottom;
+
+/**-----------------------------HTML element creation--------------------------**/
+function createBackButton(id_name, graph_name) {
+	var btn = document.createElement("BUTTON");
+	btn.setAttribute("id", id_name);
+	var t = document.createTextNode("Go back on "+graph_name+" graph");
+	btn.appendChild(t);
+	document.body.appendChild(btn);
+}
+
+function createGraphArea(id_name){
+	var div=document.createElement("div");
+	div.setAttribute("id",id_name);
+	document.body.appendChild(div);
+}
 
 /**-----------------------------Taxa Graph API functions-----------------------**/
 //function that gets total annotated taxa count
@@ -125,7 +130,6 @@ function getPartOf(uberonURL, callback) {
 			var child = json.results[i]['@id'];
 			if (child.length > 5 && child.length < 100) {
 				children.push(child);
-				console.log('Child: ' + child);
 			}
 		}
 
@@ -215,15 +219,12 @@ var insertLinebreaks = function(t, d, width) {
 
 };
 
-function graphAxisSetUp() {
-
-}
-
 /**-----------------------Actual graphing functions-----------------------------**/
 
 //taxa graphing function
 function drawGraph(data) {
 	stack.push(data);
+
 	var x = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
 		.domain(sortDescending(data).map(function(d) {
@@ -329,7 +330,6 @@ function drawGraph(data) {
 
 	//to go back on graph
 	var svg = d3.select('#taxa_button').on('click', function() {
-		console.log(stack.length);
 		if (stack.length == 1) {
 			alert("Can't go back anymore");
 		} else {
@@ -363,8 +363,6 @@ function drawGraph(data) {
 			removeEverything(tip, "taxa");
 			//console.log(result);
 			drawGraph(result);
-			done = true;
-			console.log(done);
 		}, function(err) {
 			alert("No more descending possible")
 			removeEverything(tip, "taxa");
@@ -376,14 +374,7 @@ function drawGraph(data) {
 
 }
 
-/**--------anatomy graph------------**/
-
-
-//drawGraph_Anat(data_Anat);
-
-
-
-//to update graph every time
+//anatomy graphing function
 function drawGraph_Anat(data) {
 	stack_Anat.push(data);
 	var x_Anat = d3.scale.ordinal()
@@ -396,7 +387,6 @@ function drawGraph_Anat(data) {
 		.domain([0, getMax(data)])
 		.range([height, 0]);
 
-	console.log("Max: " + getMax(data));
 	var xAxis_Anat = d3.svg.axis()
 		.scale(x_Anat)
 		.orient("bottom");
@@ -518,10 +508,8 @@ function drawGraph_Anat(data) {
 		});
 
 		promise.then(function(result) {
-			console.log(result);
 			removeEverything(tip_Anat, "anatomy");
 			drawGraph_Anat(result);
-			console.log("Regraphed");
 		}, function(err) {
 			alert("No more descending possible");
 			removeEverything(tip_Anat, "anatomy");
@@ -533,13 +521,14 @@ function drawGraph_Anat(data) {
 
 }
 
-
-/**------functions for graphing-----------------**/
-
-
-
+//call the functions
+createBackButton("taxa_button","taxa");
+createGraphArea("taxa");
+createBackButton("anatomy_button","anatomy");
+createGraphArea("anatomy");
 drawGraph(data);
 drawGraph_Anat(data_Anat);
+
 /**
 function graphEverything() {
 	//calling the functions
