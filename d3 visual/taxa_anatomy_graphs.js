@@ -399,8 +399,8 @@ function drawGraph(data) {
 		}, function(err) {
 			alert("No more descending possible")
 			spinner.stop()
-			removeEverything(tip, "taxa");
-			drawGraph(data);
+			//removeEverything(tip, "taxa");
+			//drawGraph(data);
 			console.log("No more descending possible", err);
 		})
 
@@ -557,8 +557,8 @@ function drawGraph_Anat(data_A) {
 			spinner.stop()
 			$('#target').empty()
 			alert("No more descending possible");
-			removeEverything(tip_Anat, "anatomy");
-			drawGraph_Anat(data_Anat);
+			//removeEverything(tip_Anat, "anatomy");
+			//drawGraph_Anat(data_Anat);
 			console.log("Failed!", err);
 		})
 
