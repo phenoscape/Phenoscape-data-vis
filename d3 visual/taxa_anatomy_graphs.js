@@ -27,6 +27,31 @@ var data_Anat = {
 	'post-cranial axial skeletal system': [4263, 'http://purl.obolibrary.org/obo/UBERON_0011138']
 };
 
+//loading bar 
+var opts = {
+  lines: 13 // The number of lines to draw
+, length: 28 // The length of each line
+, width: 14 // The line thickness
+, radius: 42 // The radius of the inner circle
+, scale: 1 // Scales overall size of the spinner
+, corners: 1 // Corner roundness (0..1)
+, color: '#000' // #rgb or #rrggbb or array of colors
+, opacity: 0.25 // Opacity of the lines
+, rotate: 0 // The rotation offset
+, direction: 1 // 1: clockwise, -1: counterclockwise
+, speed: 1 // Rounds per second
+, trail: 60 // Afterglow percentage
+, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+, zIndex: 2e9 // The z-index (defaults to 2000000000)
+, className: 'spinner' // The CSS class to assign to the spinner
+, top: '50%' // Top position relative to parent
+, left: '50%' // Left position relative to parent
+, shadow: false // Whether to render a shadow
+, hwaccel: false // Whether to use hardware acceleration
+, position: 'absolute' // Element positioning
+}
+
+
 var phenoBlue = d3.rgb(66, 139, 202); //main color
 
 var stack = new Array(); // stores taxa path to be able to go back
@@ -225,6 +250,8 @@ var insertLinebreaks = function(t, d, width) {
 function drawGraph(data) {
 	stack.push(data);
 
+	var target = document.getElementById('target_taxa')
+
 	var x = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
 		.domain(sortDescending(data).map(function(d) {
@@ -297,6 +324,7 @@ function drawGraph(data) {
 			d3.select(this).style("fill", "black");
 		})
 		.on("click", function(d) {
+			console.log(data[d][1]);
 			document.location.href = "http://kb.phenoscape.org/#/taxon/" + data[d][1];
 		});
 
@@ -341,10 +369,14 @@ function drawGraph(data) {
 
 	//update to get sub anatomies based on click
 	bars.on('click', function(d, i) {
+		var spinner = new Spinner(opts).spin(target); //create loading spinner
 		var promise = new Promise(function(resolve, reject) {
 			var dataset = [];
 			var VTOurl = d3.values(d)[1][1];
 			getTaxaInRank(VTOurl, function(d) {
+				if (d.length == 0) {
+					reject(Error("No more descending possible"));
+				}
 				for (var i in d) { //iterate through array of subtaxa
 					get_total(d[i], function(i, total) {
 						getName(d[i], function(name, latin) {
@@ -362,9 +394,11 @@ function drawGraph(data) {
 		promise.then(function(result) {
 			removeEverything(tip, "taxa");
 			//console.log(result);
+			spinner.stop()
 			drawGraph(result);
 		}, function(err) {
 			alert("No more descending possible")
+			spinner.stop()
 			removeEverything(tip, "taxa");
 			drawGraph(data);
 			console.log("No more descending possible", err);
@@ -375,16 +409,19 @@ function drawGraph(data) {
 }
 
 //anatomy graphing function
-function drawGraph_Anat(data) {
-	stack_Anat.push(data);
+function drawGraph_Anat(data_A) {
+	stack_Anat.push(data_A);
+
+	var target = document.getElementById('target_anat')
+
 	var x_Anat = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
-		.domain(sortDescending(data).map(function(d) {
+		.domain(sortDescending(data_A).map(function(d) {
 			return d.key;
 		}));
 
 	var y_Anat = d3.scale.linear()
-		.domain([0, getMax(data)])
+		.domain([0, getMax(data_A)])
 		.range([height, 0]);
 
 	var xAxis_Anat = d3.svg.axis()
@@ -433,7 +470,7 @@ function drawGraph_Anat(data) {
 		.style("text-anchor", "start");
 
 	//hyperlink the x axis labels
-	d3.selectAll("text")
+	d3.select("#anatomy").selectAll("text")
 		.filter(function(d) {
 			return typeof(d) == "string";
 		})
@@ -445,7 +482,7 @@ function drawGraph_Anat(data) {
 			d3.select(this).style("fill", "black");
 		})
 		.on("click", function(d) {
-			document.location.href = "http://kb.phenoscape.org/#/entity/" + data[d][1];
+			document.location.href = "http://kb.phenoscape.org/#/entity/" + data_A[d][1];
 		});
 
 	var yLine_Anat = svg1.append("g") //HERE KEEP ADDING _ANAT'S
@@ -459,7 +496,7 @@ function drawGraph_Anat(data) {
 		.text("Annotated Taxa Count");
 
 	var bars_Anat = svg1.selectAll(".bar")
-		.data(d3.entries(data))
+		.data(d3.entries(data_A))
 		.enter().append("rect")
 		.attr("fill", phenoBlue)
 		.attr("class", "bar")
@@ -489,15 +526,13 @@ function drawGraph_Anat(data) {
 	});
 	//update to get sub anatomies based on click
 	bars_Anat.on('click', function(d, i) {
-		//get new data
-		//get immediate parts
-
-		var promise = new Promise(function(resolve, reject) {
+		var spinner = new Spinner(opts).spin(target); //create loading spinner
+		var promise_anat = new Promise(function(resolve, reject) {
 			var dataset_Anat = [];
 			var uberonURL = d3.values(d)[1][1];
 			getPartOf(uberonURL, function(d) { //get parts
 				if (d.length == 0) {
-					alert("No more descending possible");
+					reject(Error("No more descending possible"));
 				}
 				for (var i in d) {
 					get_total_Anat(getUberon(d[i]), function(i, total) {
@@ -514,10 +549,13 @@ function drawGraph_Anat(data) {
 			setTimeout(resolve.bind(null, data), 10000);
 		});
 
-		promise.then(function(result) {
+		promise_anat.then(function(result) {
 			removeEverything(tip_Anat, "anatomy");
+			spinner.stop()
 			drawGraph_Anat(result);
 		}, function(err) {
+			spinner.stop()
+			$('#target').empty()
 			alert("No more descending possible");
 			removeEverything(tip_Anat, "anatomy");
 			drawGraph_Anat(data_Anat);
@@ -529,12 +567,17 @@ function drawGraph_Anat(data) {
 }
 
 //call the functions
+createGraphArea("target_taxa")
 createBackButton("taxa_button", "taxa");
 createGraphArea("taxa");
+drawGraph(data);
+
+//createGraphArea("target")
+
 createBackButton("anatomy_button", "anatomy");
 createGraphArea("anatomy");
-drawGraph(data);
 drawGraph_Anat(data_Anat);
+createGraphArea("target_anat")
 
 /**
 function graphEverything() {
