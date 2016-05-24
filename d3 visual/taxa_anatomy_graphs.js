@@ -29,26 +29,45 @@ var data_Anat = {
 
 //loading bar 
 var opts = {
-  lines: 13 // The number of lines to draw
-, length: 28 // The length of each line
-, width: 14 // The line thickness
-, radius: 42 // The radius of the inner circle
-, scale: 1 // Scales overall size of the spinner
-, corners: 1 // Corner roundness (0..1)
-, color: '#000' // #rgb or #rrggbb or array of colors
-, opacity: 0.25 // Opacity of the lines
-, rotate: 0 // The rotation offset
-, direction: 1 // 1: clockwise, -1: counterclockwise
-, speed: 1 // Rounds per second
-, trail: 60 // Afterglow percentage
-, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
-, zIndex: 2e9 // The z-index (defaults to 2000000000)
-, className: 'spinner' // The CSS class to assign to the spinner
-, top: '50%' // Top position relative to parent
-, left: '50%' // Left position relative to parent
-, shadow: false // Whether to render a shadow
-, hwaccel: false // Whether to use hardware acceleration
-, position: 'absolute' // Element positioning
+	lines: 13 // The number of lines to draw
+		,
+	length: 28 // The length of each line
+		,
+	width: 14 // The line thickness
+		,
+	radius: 42 // The radius of the inner circle
+		,
+	scale: 1 // Scales overall size of the spinner
+		,
+	corners: 1 // Corner roundness (0..1)
+		,
+	color: '#000' // #rgb or #rrggbb or array of colors
+		,
+	opacity: 0.25 // Opacity of the lines
+		,
+	rotate: 0 // The rotation offset
+		,
+	direction: 1 // 1: clockwise, -1: counterclockwise
+		,
+	speed: 1 // Rounds per second
+		,
+	trail: 60 // Afterglow percentage
+		,
+	fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+		,
+	zIndex: 2e9 // The z-index (defaults to 2000000000)
+		,
+	className: 'spinner' // The CSS class to assign to the spinner
+		,
+	top: '80%' // Top position relative to parent
+		,
+	left: '50%' // Left position relative to parent
+		,
+	shadow: false // Whether to render a shadow
+		,
+	hwaccel: false // Whether to use hardware acceleration
+		//,
+	//position: 'absolute' // Element positioning
 }
 
 
@@ -399,8 +418,8 @@ function drawGraph(data) {
 		}, function(err) {
 			alert("No more descending possible")
 			spinner.stop()
-			//removeEverything(tip, "taxa");
-			//drawGraph(data);
+				//removeEverything(tip, "taxa");
+				//drawGraph(data);
 			console.log("No more descending possible", err);
 		})
 
@@ -411,8 +430,6 @@ function drawGraph(data) {
 //anatomy graphing function
 function drawGraph_Anat(data_A) {
 	stack_Anat.push(data_A);
-
-	var target = document.getElementById('target_anat')
 
 	var x_Anat = d3.scale.ordinal()
 		.rangeRoundBands([0, width], .1)
@@ -526,6 +543,7 @@ function drawGraph_Anat(data_A) {
 	});
 	//update to get sub anatomies based on click
 	bars_Anat.on('click', function(d, i) {
+		var target = document.getElementById('target_anat')
 		var spinner = new Spinner(opts).spin(target); //create loading spinner
 		var promise_anat = new Promise(function(resolve, reject) {
 			var dataset_Anat = [];
@@ -575,9 +593,10 @@ drawGraph(data);
 //createGraphArea("target")
 
 createBackButton("anatomy_button", "anatomy");
+createGraphArea("target_anat")
 createGraphArea("anatomy");
 drawGraph_Anat(data_Anat);
-createGraphArea("target_anat")
+
 
 /**
 function graphEverything() {
